@@ -33,8 +33,10 @@
             return null;
         }
         
-        const nameEl = playerContainer.querySelector('[data-test-element="user-tagline-username"]');
-        const ratingEl = playerContainer.querySelector('[data-cy="user-tagline-rating"]');
+        const nameEl = playerContainer.querySelector('[data-test-element="user-tagline-username"]') ||
+                       playerContainer.querySelector('[class*="user-username"]');
+        const ratingEl = playerContainer.querySelector('[data-cy="user-tagline-rating"]') ||
+                         playerContainer.querySelector('[class*="user-rating"]');
         
         if (!nameEl) warn(`Name element missing for ${identifier}.`);
         if (!ratingEl) warn(`Rating element missing for ${identifier}.`);
