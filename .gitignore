@@ -1,0 +1,45 @@
+# config
+config.json
+
+.# ==========================================
+# Virtual Environments & Packages
+# ==========================================
+.venv/
+venv/
+env/
+ENV/
+build/
+dist/
+*.egg-info/
+
+# ==========================================
+# uv & Cache Files
+# ==========================================
+.uv/
+__pycache__/
+*.py[cod]
+*$py.class
+
+# ==========================================
+# Testing & Tooling
+# ==========================================
+.pytest_cache/
+.coverage
+htmlcov/
+.mypy_cache/
+.ruff_cache/
+
+# ==========================================
+# Environment Variables & Secrets (CRITICAL)
+# ==========================================
+.env
+.env.local
+*.pem
+
+# ==========================================
+# IDE & System Files
+# ==========================================
+.vscode/
+.idea/
+.DS_Store
+Thumbs.db
