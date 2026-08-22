@@ -65,9 +65,14 @@
             return;
         }
 
-        // 3. Determine colors
-        const topIsWhite = document.querySelector('.clock-top.clock-white') !== null;
-        const bottomIsWhite = document.querySelector('.clock-bottom.clock-white') !== null;
+        // 3. Determine colors (color class sits on the clock component inside each player row)
+        const topClockEl = topPlayerEl.querySelector('.clock-component') ||
+                           document.querySelector('.clock-top');
+        const bottomClockEl = bottomPlayerEl.querySelector('.clock-component') ||
+                              document.querySelector('.clock-bottom');
+
+        const topIsWhite = topClockEl ? topClockEl.classList.contains('clock-white') : false;
+        const bottomIsWhite = bottomClockEl ? bottomClockEl.classList.contains('clock-white') : false;
         
         if (!topIsWhite && !bottomIsWhite) {
             warn("Could not determine player colors. Waiting for clocks to render.");
@@ -83,12 +88,20 @@
             return;
         }
 
-        // 5. Extract Clocks
-        const topTimeEl = document.querySelector('.clock-top [data-cy="clock-time"]');
-        const bottomTimeEl = document.querySelector('.clock-bottom [data-cy="clock-time"]');
+        // 5. Extract Clocks (time lives in .clock-time-monospace[role="timer"])
+        const getTime = (clockEl) => {
+            if (!clockEl) return '0:00';
+            const timeEl = clockEl.querySelector('[role="timer"]') ||
+                           clockEl.querySelector('.clock-time-monospace');
+            return timeEl ? timeEl.innerText.trim() : '0:00';
+        };
 
-        topData.time = topTimeEl ? topTimeEl.innerText.trim() : '0:00';
-        bottomData.time = bottomTimeEl ? bottomTimeEl.innerText.trim() : '0:00';
+        topData.time = getTime(topClockEl);
+        bottomData.time = getTime(bottomClockEl);
+
+        // Whose turn it is, useful signal from clock-player-turn
+        topData.turn = topClockEl ? topClockEl.classList.contains('clock-player-turn') : false;
+        bottomData.turn = bottomClockEl ? bottomClockEl.classList.contains('clock-player-turn') : false;
 
         // 6. Map to White/Black
         const whiteData = topIsWhite ? topData : bottomData;
