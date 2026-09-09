@@ -1,7 +1,7 @@
 [project]
 name = "server"
 version = "0.1.0"
-description = "Add your description here"
+description = "Local bridge forwarding Chess.com game data to Discord Rich Presence"
 requires-python = ">=3.14"
 dependencies = [
     "pypresence>=4.6.2",
