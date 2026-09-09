@@ -18,6 +18,9 @@ with open(CONFIG_PATH, "r") as f:
 # "localhost", which resolves to ::1 first under RFC 6724 -- the userscript
 # posts to 127.0.0.1 to match.
 HOST = "127.0.0.1"
+# Duplicated as LOCAL_PORT in userscript/chesscom-rpc-exporter.user.js; the
+# browser sandbox cannot read this file, so the two must be changed together.
+# A mismatch is at least loud: the userscript logs a network error every 2s.
 PORT = 3344
 
 # Discord rate-limits activity updates to once per 15 seconds.
@@ -27,6 +30,11 @@ UPDATE_THROTTLE = 15
 # posting otherwise -- it never sends an explicit "game over". Absence of
 # payloads is therefore our only end-of-game signal, and it is the one that
 # also covers a browser crash or a killed tab.
+#
+# This MUST stay comfortably above UPDATE_INTERVAL_MS in the userscript.
+# Raise that interval past this value and the presence gets cleared in the
+# middle of a live game -- with no error on either side, because from here an
+# idle userscript and a finished game look identical.
 IDLE_TIMEOUT = 30
 
 # Discord is typically not up yet when this starts at login, and may restart
