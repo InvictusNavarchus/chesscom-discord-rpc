@@ -104,6 +104,22 @@ Because the unit is `Restart=always`, a startup crash loops every 5s and shows
 as `activating (auto-restart)` rather than `failed` — which reads as "busy",
 not "broken". Check the logs after any edit.
 
+## Releasing
+
+```bash
+./bump.sh 0.2.0
+```
+
+Rewrites the version in `server/pyproject.toml`, the userscript's `@version`
+header and `server/uv.lock`, then commits and tags. It refuses to run on a
+dirty tree, and refuses if those files have already drifted apart rather than
+papering over it.
+
+It stops there — review, then push and publish with the commands it prints.
+
+The userscript's `@version` is the one that will matter: add `@updateURL` and
+Tampermonkey uses that number to decide whether anyone receives an update.
+
 ## Shared constants
 
 Two values are duplicated between the server and the userscript. They cannot
