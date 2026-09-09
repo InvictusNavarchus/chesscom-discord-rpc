@@ -9,7 +9,8 @@
 
 set -euo pipefail
 
-SERVER_DIR="$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")" && pwd)"
+REPO_ROOT="$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")" && pwd)"
+SERVER_DIR="$REPO_ROOT/server"
 UNIT_NAME="chesscom-rpc.service"
 TEMPLATE="$SERVER_DIR/$UNIT_NAME.in"
 UNIT_DIR="${XDG_CONFIG_HOME:-$HOME/.config}/systemd/user"
@@ -131,7 +132,12 @@ info "${B}$UNIT_NAME is running and enabled at login.${N}"
 printf '\n'
 printf '  Logs:    journalctl --user -u %s -f\n' "$UNIT_NAME"
 printf '  Stop:    systemctl --user stop %s\n' "$UNIT_NAME"
-printf '  Remove:  %s/install.sh --uninstall\n' "$SERVER_DIR"
+printf '  Remove:  %s/install.sh --uninstall\n' "$REPO_ROOT"
 printf '\n'
 printf '  Discord does not need to be running: the bridge connects lazily on\n'
 printf '  the first payload from the userscript.\n'
+printf '\n'
+printf '%sOne manual step remains -- this installs the server only.%s\n' "$Y" "$N"
+printf '  Load %s/userscript/chesscom-rpc-exporter.user.js into Tampermonkey.\n' "$REPO_ROOT"
+printf '  Reinstall it there after any change to that file: Tampermonkey pins\n'
+printf '  the @connect grant, so a stale copy is blocked from reaching :%s.\n' "$PORT"

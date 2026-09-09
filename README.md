@@ -49,14 +49,14 @@ it is missing, but the example's `client_id` is not yours — set it.
 ### 3. Install the server
 
 ```bash
-./server/install.sh
+./install.sh
 ```
 
 Installs a **systemd user service** that starts at login. It creates the venv
 if needed, validates `config.json`, refuses to install if something else holds
 port 3344, and verifies the service actually came up.
 
-`./server/install.sh --uninstall` reverses it. `config.json` and `.venv` are
+`./install.sh --uninstall` reverses it. `config.json` and `.venv` are
 left alone.
 
 To run it by hand instead:
@@ -94,11 +94,11 @@ save it. It activates on `chess.com/game/*` and `chess.com/play/*`.
 | --- | --- |
 | Logs | `journalctl --user -u chesscom-rpc -f` |
 | Restart after editing `main.py` or `config.json` | `systemctl --user restart chesscom-rpc` |
-| Apply an edit to `chesscom-rpc.service.in` | `./server/install.sh` |
+| Apply an edit to `server/chesscom-rpc.service.in` | `./install.sh` |
 | Stop | `systemctl --user stop chesscom-rpc` |
 
-Editing `main.py` needs only a restart; the unit references it by path. Only
-template edits and moving the repo need `install.sh` re-run.
+Editing `server/main.py` needs only a restart; the unit references it by
+path. Only template edits and moving the repo need `install.sh` re-run.
 
 Because the unit is `Restart=always`, a startup crash loops every 5s and shows
 as `activating (auto-restart)` rather than `failed` — which reads as "busy",
