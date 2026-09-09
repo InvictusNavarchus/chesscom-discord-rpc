@@ -1,0 +1,18 @@
+[Unit]
+Description=Chess.com Discord Rich Presence bridge
+# No ordering against Discord on purpose: main.py binds its HTTP port
+# regardless of Discord's state and connects to the IPC socket lazily, so
+# starting before Discord (the normal case at login) is fine.
+
+[Service]
+Type=simple
+WorkingDirectory=%h/coding/personal/monorepo/chesscom-discord-rpc/server
+ExecStart=%h/coding/personal/monorepo/chesscom-discord-rpc/server/.venv/bin/python main.py
+# Unbuffered, otherwise stdout is block-buffered into journald and the logs
+# only appear long after the events they describe.
+Environment=PYTHONUNBUFFERED=1
+Restart=always
+RestartSec=5
+
+[Install]
+WantedBy=default.target
