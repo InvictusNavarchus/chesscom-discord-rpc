@@ -140,7 +140,7 @@
 
         log("Generated Payload:", payload);
 
-        // 9. Send to Local Node Server
+        // 9. Send to the local RPC server
         GM_xmlhttpRequest({
             method: "POST",
             url: `http://127.0.0.1:${LOCAL_PORT}/update`,
@@ -156,7 +156,7 @@
                 }
             },
             onerror: function(err) {
-                error(`Network Error: Could not reach 127.0.0.1:${LOCAL_PORT}. Is your Node.js server running?`);
+                error(`Network Error: Could not reach 127.0.0.1:${LOCAL_PORT}. Is the RPC server running?`);
             }
         });
     }
