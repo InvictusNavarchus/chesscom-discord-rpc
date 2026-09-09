@@ -6,7 +6,7 @@
 // @match        https://www.chess.com/game/*
 // @match        https://www.chess.com/play/*
 // @grant        GM_xmlhttpRequest
-// @connect      localhost
+// @connect      127.0.0.1
 // ==/UserScript==
 
 (function() {
@@ -137,20 +137,20 @@
         // 9. Send to Local Node Server
         GM_xmlhttpRequest({
             method: "POST",
-            url: `http://localhost:${LOCAL_PORT}/update`,
+            url: `http://127.0.0.1:${LOCAL_PORT}/update`,
             data: JSON.stringify(payload),
             headers: {
                 "Content-Type": "application/json"
             },
             onload: function(response) {
                 if (response.status >= 200 && response.status < 300) {
-                    log(`Success: Sent data to localhost:${LOCAL_PORT}. Server replied: ${response.responseText}`);
+                    log(`Success: Sent data to 127.0.0.1:${LOCAL_PORT}. Server replied: ${response.responseText}`);
                 } else {
                     warn(`Server rejected payload. HTTP ${response.status}: ${response.statusText}`);
                 }
             },
             onerror: function(err) {
-                error(`Network Error: Could not reach localhost:${LOCAL_PORT}. Is your Node.js server running?`);
+                error(`Network Error: Could not reach 127.0.0.1:${LOCAL_PORT}. Is your Node.js server running?`);
             }
         });
     }

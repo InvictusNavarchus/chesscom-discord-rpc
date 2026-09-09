@@ -13,6 +13,11 @@ CONFIG_PATH = os.path.join(os.path.dirname(os.path.abspath(__file__)), "config.j
 with open(CONFIG_PATH, "r") as f:
     config = json.load(f)
 
+# Loopback only: this accepts unauthenticated presence data, so it has no
+# business being reachable from the LAN. Bound to the IPv4 literal rather than
+# "localhost", which resolves to ::1 first under RFC 6724 -- the userscript
+# posts to 127.0.0.1 to match.
+HOST = "127.0.0.1"
 PORT = 3344
 
 # Discord rate-limits activity updates to once per 15 seconds.
@@ -219,9 +224,9 @@ if __name__ == '__main__':
 
     signal.signal(signal.SIGTERM, on_sigterm)
 
-    server_address = ('', PORT)
+    server_address = (HOST, PORT)
     httpd = ChessRPCServer(server_address, ChessRPCHandler)
-    print(f"Listening for Chess.com data on http://localhost:{PORT}")
+    print(f"Listening for Chess.com data on http://{HOST}:{PORT}")
 
     try:
         httpd.serve_forever(poll_interval=2)
