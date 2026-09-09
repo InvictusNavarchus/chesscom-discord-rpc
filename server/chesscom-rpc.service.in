@@ -1,3 +1,6 @@
+# Template. install.sh renders @SERVER_DIR@ and writes the result to
+# ~/.config/systemd/user/. Don't install this file directly.
+
 [Unit]
 Description=Chess.com Discord Rich Presence bridge
 # No ordering against Discord on purpose: main.py binds its HTTP port
@@ -6,8 +9,8 @@ Description=Chess.com Discord Rich Presence bridge
 
 [Service]
 Type=simple
-WorkingDirectory=%h/coding/personal/monorepo/chesscom-discord-rpc/server
-ExecStart=%h/coding/personal/monorepo/chesscom-discord-rpc/server/.venv/bin/python main.py
+WorkingDirectory=@SERVER_DIR@
+ExecStart=@SERVER_DIR@/.venv/bin/python main.py
 # Unbuffered, otherwise stdout is block-buffered into journald and the logs
 # only appear long after the events they describe.
 Environment=PYTHONUNBUFFERED=1
