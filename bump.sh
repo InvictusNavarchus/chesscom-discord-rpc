@@ -13,7 +13,7 @@ set -euo pipefail
 
 REPO_ROOT="$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")" && pwd)"
 PYPROJECT="$REPO_ROOT/server/pyproject.toml"
-USERSCRIPT="$REPO_ROOT/userscript/chesscom-rpc-exporter.user.js"
+USERSCRIPT="$REPO_ROOT/userscript/package.json"
 LOCKFILE="$REPO_ROOT/server/uv.lock"
 
 if [[ -t 1 ]]; then
@@ -57,17 +57,17 @@ done
 # --- Read and cross-check the current version -------------------------------
 
 cur_py=$(sed -n 's/^version = "\(.*\)"$/\1/p' "$PYPROJECT")
-cur_us=$(sed -n 's|^// @version[[:space:]]\+\([^[:space:]]\+\).*|\1|p' "$USERSCRIPT")
+cur_us=$(sed -n 's/^[[:space:]]*"version":[[:space:]]*"\([^"]*\)".*/\1/p' "$USERSCRIPT")
 
 [[ -n "$cur_py" ]] || die "could not read version from $PYPROJECT"
-[[ -n "$cur_us" ]] || die "could not read @version from $USERSCRIPT"
+[[ -n "$cur_us" ]] || die "could not read version from $USERSCRIPT"
 
 # If these have already drifted, something went wrong earlier; overwriting
 # would hide it.
 [[ "$cur_py" == "$cur_us" ]] \
     || die "versions are already out of sync -- fix by hand first.
        pyproject.toml: $cur_py
-       userscript:     $cur_us"
+       package.json:   $cur_us"
 
 [[ "$cur_py" != "$NEW" ]] || die "already at $NEW."
 
@@ -88,13 +88,20 @@ fi
 # --- Rewrite ----------------------------------------------------------------
 
 sed -i "s|^version = \".*\"|version = \"$NEW\"|" "$PYPROJECT"
-sed -i "s|^\(// @version[[:space:]]\+\)[^[:space:]]\+|\1$NEW|" "$USERSCRIPT"
+sed -i "s|^\([[:space:]]*\"version\":[[:space:]]*\"\)[^\"]*\(.*\)|\1$NEW\2|" "$USERSCRIPT"
 
 # Read back rather than trusting sed's exit status, which is 0 on no-match.
 [[ "$(sed -n 's/^version = "\(.*\)"$/\1/p' "$PYPROJECT")" == "$NEW" ]] \
     || die "failed to rewrite the version in $PYPROJECT"
-[[ "$(sed -n 's|^// @version[[:space:]]\+\([^[:space:]]\+\).*|\1|p' "$USERSCRIPT")" == "$NEW" ]] \
-    || die "failed to rewrite @version in $USERSCRIPT"
+[[ "$(sed -n 's/^[[:space:]]*"version":[[:space:]]*"\([^"]*\)".*/\1/p' "$USERSCRIPT")" == "$NEW" ]] \
+    || die "failed to rewrite version in $USERSCRIPT"
+
+# Build userscript artifact for release
+if command -v bun >/dev/null 2>&1; then
+    (cd "$REPO_ROOT/userscript" && bun run build)
+else
+    warn "bun not found; userscript artifact not built."
+fi
 
 # uv.lock records the project's own version, so it goes stale on every bump.
 if command -v uv >/dev/null 2>&1; then
@@ -121,7 +128,7 @@ git tag -a "$TAG" -m "$TAG"
 info "${B}Committed and tagged $TAG.${N}"
 printf '\n'
 printf '  Publish:  git push origin master %s\n' "$TAG"
-printf '            gh release create %s --generate-notes\n' "$TAG"
+printf '            gh release create %s userscript/dist/chesscom-rpc-exporter.user.js --generate-notes\n' "$TAG"
 printf '\n'
 printf '  Undo (before pushing):\n'
 printf '            git tag -d %s && git reset --hard HEAD~1\n' "$TAG"

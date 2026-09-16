@@ -1,5 +1,6 @@
 import { defineConfig } from 'vite';
 import monkey from 'vite-plugin-monkey';
+import pkg from './package.json' with { type: 'json' };
 
 export default defineConfig({
   plugins: [
@@ -8,7 +9,7 @@ export default defineConfig({
       userscript: {
         name: 'Chess.com Discord RPC Exporter',
         namespace: 'http://tampermonkey.net/',
-        version: '0.1.0',
+        version: pkg.version,
         description: 'Extracts live game data and sends it to a local server for Discord RPC',
         match: [
           'https://www.chess.com/game/*',
