@@ -7,7 +7,7 @@ export default defineConfig({
     monkey({
       entry: 'src/main.ts',
       userscript: {
-        name: 'Chess.com Discord RPC Exporter',
+        name: 'Chess.com & Lichess Discord RPC Exporter',
         namespace: 'http://tampermonkey.net/',
         version: pkg.version,
         description: 'Extracts live game data from Chess.com and Lichess and sends it to a local server for Discord RPC',
