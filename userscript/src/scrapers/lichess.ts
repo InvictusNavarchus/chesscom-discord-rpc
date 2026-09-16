@@ -14,11 +14,25 @@ function getLichessPlayerData(container: Element | null, identifier: string): Pl
   if (!nameEl) warn(`Name element missing for ${identifier}.`);
   if (!ratingEl) warn(`Rating element missing for ${identifier}.`);
 
+  let name = 'Unknown';
+  if (nameEl) {
+    const href = nameEl.getAttribute('href');
+    const hrefMatch = href ? href.match(/^\/@\/([^/?#]+)/) : null;
+    if (hrefMatch) {
+      name = hrefMatch[1];
+    } else {
+      const clone = nameEl.cloneNode(true) as HTMLElement;
+      clone.querySelectorAll('.utitle').forEach((el) => el.remove());
+      name = getElementText(clone) || 'Unknown';
+    }
+  }
+
   return {
-    name: nameEl ? getElementText(nameEl) : 'Unknown',
+    name,
     rating: ratingEl ? getElementText(ratingEl).replace(/[()]/g, '').trim() : '?',
   };
 }
+
 
 function getLichessClockTime(clockEl: Element | null): string {
   if (!clockEl) return '0:00';
@@ -35,6 +49,19 @@ export function scrapeLichess(): GamePayload | null {
     log('Not currently in a game (round container not found).');
     return null;
   }
+
+  // Check if game has ended (result banner, terminal status, or game result summary)
+  const isGameOver = Boolean(
+    document.querySelector('.result-wrap') ||
+    document.querySelector('.game__meta .status') ||
+    document.querySelector('.round__app .status') ||
+    document.querySelector('.round__app .game-result')
+  );
+  if (isGameOver) {
+    log('Game has concluded. Reporting not in game.');
+    return null;
+  }
+
 
   // 2. Find player containers
   const topPlayerEl = document.querySelector('.ruser-top');
@@ -88,7 +115,13 @@ export function scrapeLichess(): GamePayload | null {
 
   // 7. Determine local user and playing status
   const localUserEl = document.getElementById('user_tag') || document.querySelector('a#user_tag');
-  const localUsername = localUserEl ? getElementText(localUserEl) : null;
+  let localUsername: string | null = null;
+  if (localUserEl) {
+    const href = localUserEl.getAttribute('href');
+    const hrefMatch = href ? href.match(/^\/@\/([^/?#]+)/) : null;
+    localUsername = hrefMatch ? hrefMatch[1] : getElementText(localUserEl);
+  }
+
 
   const isInteractive = Boolean(
     document.querySelector('.rcontrols .resign') ||
