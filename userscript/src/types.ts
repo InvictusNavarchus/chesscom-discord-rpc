@@ -1,3 +1,5 @@
+export type Platform = 'chesscom' | 'lichess';
+
 export type PlayingAs = 'white' | 'black' | 'spectating';
 
 export interface PlayerData {
@@ -8,9 +10,11 @@ export interface PlayerData {
 }
 
 export interface GamePayload {
+  site: Platform;
   white: PlayerData;
   black: PlayerData;
   playingAs: PlayingAs;
   url: string;
   inGame: boolean;
 }
+
