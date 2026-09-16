@@ -120,8 +120,9 @@ SUPPORTED_PLATFORMS = {"chesscom", "lichess"}
 
 def resolve_platform(data):
     site = data.get("site")
-    if site in SUPPORTED_PLATFORMS:
+    if isinstance(site, str) and site in SUPPORTED_PLATFORMS:
         return site
+
     return None
 
 
