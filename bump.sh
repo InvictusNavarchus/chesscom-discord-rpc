@@ -99,9 +99,19 @@ sed -i "s|^\([[:space:]]*\"version\":[[:space:]]*\"\)[^\"]*\(.*\)|\1$NEW\2|" "$U
 # Build userscript artifact for release
 if command -v bun >/dev/null 2>&1; then
     (cd "$REPO_ROOT/userscript" && bun run build)
+elif command -v pnpm >/dev/null 2>&1; then
+    (cd "$REPO_ROOT/userscript" && pnpm run build)
+elif command -v npm >/dev/null 2>&1; then
+    (cd "$REPO_ROOT/userscript" && npm run build)
+elif command -v yarn >/dev/null 2>&1; then
+    (cd "$REPO_ROOT/userscript" && yarn build)
 else
-    warn "bun not found; userscript artifact not built."
+    die "no JavaScript package manager found (bun, pnpm, npm, or yarn required to build release artifact)."
 fi
+
+[[ -f "$REPO_ROOT/userscript/dist/chesscom-rpc-exporter.user.js" ]] \
+    || die "userscript release artifact was not built."
+
 
 # uv.lock records the project's own version, so it goes stale on every bump.
 if command -v uv >/dev/null 2>&1; then
