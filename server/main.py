@@ -257,9 +257,10 @@ if __name__ == '__main__':
 
     server_address = (HOST, PORT)
     httpd = ChessRPCServer(server_address, ChessRPCHandler)
-    print(f"Listening for Chess.com data on http://{HOST}:{PORT}")
+    print(f"Listening for chess data (Chess.com & Lichess) on http://{HOST}:{PORT}")
 
     try:
+
         httpd.serve_forever(poll_interval=2)
     except KeyboardInterrupt:
         print("\nShutting down.")
