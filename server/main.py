@@ -115,12 +115,25 @@ def check_idle():
     go_idle(f"no data for {IDLE_TIMEOUT}s")
 
 
+SUPPORTED_PLATFORMS = {"chesscom", "lichess"}
+
+
+def resolve_platform(data):
+    site = data.get("site")
+    if site in SUPPORTED_PLATFORMS:
+        return site
+    return None
+
+
 def build_activity(data):
     """Format the payload into Discord's details/state/small_text strings."""
     playing_as = data.get("playingAs")
     white = data.get("white", {})
     black = data.get("black", {})
-    game_mode = config.get("game_mode", "")
+
+    platform = resolve_platform(data)
+    site_cfg = config.get("sites", {}).get(platform, {}) if platform else {}
+    game_mode = site_cfg.get("game_mode", config.get("game_mode", ""))
 
     if playing_as == "spectating":
         details = f"Spectating a match | {game_mode}" if game_mode else "Spectating a match"
@@ -135,6 +148,7 @@ def build_activity(data):
         small_text = f"Playing as {playing_as.capitalize()}"
 
     return details, state, small_text
+
 
 
 class ChessRPCServer(HTTPServer):
@@ -199,17 +213,26 @@ class ChessRPCHandler(BaseHTTPRequestHandler):
 
         details, state, small_text = build_activity(data)
 
+        platform = resolve_platform(data)
+        site_cfg = config.get("sites", {}).get(platform, {}) if platform else {}
+
+        large_image = site_cfg.get("large_image") or config.get("large_image")
+        default_large_text = "Lichess.org" if platform == "lichess" else config.get("large_text")
+        large_text = site_cfg.get("large_text") or default_large_text
+        small_image = site_cfg.get("small_image") or config.get("small_image")
+
         try:
             client.update(
                 details=details,
                 state=state,
-                large_image=config.get("large_image"),
-                large_text=config.get("large_text"),
-                small_image=config.get("small_image"),
+                large_image=large_image,
+                large_text=large_text,
+                small_image=small_image,
                 small_text=small_text,
                 start=game_start,
                 buttons=[{"label": "Watch Live", "url": data.get("url")}]
             )
+
 
             last_update = now
             print(f"[Updated RPC] {details} | {state}")

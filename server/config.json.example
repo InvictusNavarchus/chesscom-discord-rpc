@@ -3,5 +3,17 @@
   "game_mode": "Rapid • 30",
   "large_image": "chessvom",
   "large_text": "Chess.com",
-  "small_image": "chessvom"
+  "small_image": "chessvom",
+  "sites": {
+    "chesscom": {
+      "large_image": "chessvom",
+      "large_text": "Chess.com",
+      "small_image": "chessvom"
+    },
+    "lichess": {
+      "large_image": "lichess",
+      "large_text": "Lichess.org",
+      "small_image": "lichess"
+    }
+  }
 }
