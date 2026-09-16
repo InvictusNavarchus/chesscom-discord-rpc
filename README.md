@@ -1,6 +1,6 @@
-# Chess.com Discord RPC
+# Chess.com & Lichess Discord RPC
 
-Shows your live Chess.com game as Discord Rich Presence.
+Shows your live Chess.com or Lichess game as Discord Rich Presence.
 
 Two halves that must both be running:
 
@@ -9,7 +9,7 @@ Two halves that must both be running:
 - **`server/`** — a small Python HTTP listener that forwards those payloads to
   the Discord desktop client over its local IPC socket.
 
-Chess.com is scraped from the DOM, so a site redesign can break extraction.
+Pages are scraped from the DOM, so site redesigns can break extraction.
 That surfaces as warnings in the browser console, not as a server error.
 
 > All commands below are run from the repository root.
@@ -19,6 +19,7 @@ That surfaces as warnings in the browser console, not as a server error.
 - Discord **desktop** client (the web app exposes no IPC socket)
 - [Tampermonkey](https://www.tampermonkey.net/)
 - [`uv`](https://docs.astral.sh/uv/), and Python ≥ 3.14
+- [Bun](https://bun.sh/) (to build or develop the userscript)
 
 ## Setup
 
@@ -42,6 +43,7 @@ cp server/config.json.example server/config.json
 | `large_image` | Art asset name for the big icon |
 | `large_text` | Tooltip on the big icon |
 | `small_image` | Art asset name for the corner badge |
+| `sites` | Optional per-platform overrides (`chesscom`, `lichess`) for `large_image`, `large_text`, and `small_image` |
 
 `config.json` is gitignored. `install.sh` will create it from the example if
 it is missing, but the example's `client_id` is not yours — set it.
@@ -67,10 +69,28 @@ cd server && uv run main.py
 
 ### 4. Install the userscript
 
-Open `userscript/chesscom-rpc-exporter.user.js` in Tampermonkey's editor and
-save it. It activates on `chess.com/game/*` and `chess.com/play/*`.
+#### Option A: Build from source
 
-> Reinstall this file after pulling changes to it. Tampermonkey pins the
+Build the script with [Bun](https://bun.sh/):
+
+```bash
+cd userscript && bun install && bun run build
+```
+
+Then open `userscript/dist/chesscom-rpc-exporter.user.js` and paste it into Tampermonkey. It activates on `chess.com/game/*`, `chess.com/play/*`, and `lichess.org/*`.
+
+
+For live development with HMR:
+
+```bash
+cd userscript && bun dev
+```
+
+#### Option B: Install from release
+
+Download `chesscom-rpc-exporter.user.js` from the [latest GitHub Release](https://github.com/InvictusNavarchus/chesscom-discord-rpc/releases/latest) and install it into Tampermonkey.
+
+> Reinstall the userscript after pulling changes to it. Tampermonkey pins the
 > `@connect` grant at install time, so an old copy is *blocked* from reaching
 > the server and simply logs a network error.
 
@@ -110,15 +130,13 @@ not "broken". Check the logs after any edit.
 ./bump.sh 0.2.0
 ```
 
-Rewrites the version in `server/pyproject.toml`, the userscript's `@version`
-header and `server/uv.lock`, then commits and tags. It refuses to run on a
-dirty tree, and refuses if those files have already drifted apart rather than
-papering over it.
+Rewrites the version in `server/pyproject.toml`, `userscript/package.json`,
+and `server/uv.lock`, builds the release userscript artifact in
+`userscript/dist/`, then commits and tags. It refuses to run on a dirty tree,
+and refuses if those files have already drifted apart rather than papering
+over it.
 
 It stops there — review, then push and publish with the commands it prints.
-
-The userscript's `@version` is the one that will matter: add `@updateURL` and
-Tampermonkey uses that number to decide whether anyone receives an update.
 
 ## Shared constants
 

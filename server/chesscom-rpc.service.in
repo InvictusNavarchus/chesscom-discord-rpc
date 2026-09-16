@@ -2,7 +2,7 @@
 # ~/.config/systemd/user/. Don't install this file directly.
 
 [Unit]
-Description=Chess.com Discord Rich Presence bridge
+Description=Chess.com and Lichess Discord Rich Presence bridge
 # No ordering against Discord on purpose: main.py binds its HTTP port
 # regardless of Discord's state and connects to the IPC socket lazily, so
 # starting before Discord (the normal case at login) is fine.

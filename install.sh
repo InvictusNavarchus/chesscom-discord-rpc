@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 #
-# Install (or remove) the Chess.com Discord RPC bridge as a systemd user
+# Install (or remove) the Chess.com and Lichess Discord RPC bridge as a systemd user
 # service. Safe to re-run: it re-renders the unit and restarts the service,
 # so this is also how you apply an edit to chesscom-rpc.service.in.
 #
